@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Engagement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="container mt-4">
+            <div class="container-fluid mb-4">
+                <nav class="nav nav-pills d-flex flex-wrap gap-2 align-items-center">
+                    <div class="me-auto d-flex gap-2">
+                        {% if has_language %}
+                        <a class="nav-link" href="/views/index/{{ lang }}">View Engagements</a>
+                        {% else %}
+                        <a class="nav-link" href="/views/index">View Engagements</a>
+                        {% endif %}
+                        <a class="nav-link active" href="/views/new">Add Engagement</a>
+                        <a class="nav-link" href="/views/manage">Manage Team</a>
+                    </div>
+
+                    {% for lang_option in all_langs %}
+                    <a href="/views/new/{{ lang_option }}"
+                        class="nav-link {% if lang.as_str() == lang_option.as_str() %}active{% endif %}">
+                        {{ lang_option }}
+                    </a>
+                    {% endfor %}
+                    <form action="/auth/logout" method="POST" class="ms-2">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+        </div>
+
+        {% if has_language %}
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">New Engagement</h2>
+                <form id="engagementForm" class="engagement-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="instructor" class="form-label">Instructor:</label>
+                                <select class="form-select" id="instructor-select" name="instructor">
+                                    <option value="">Select instructor...</option>
+                                    {% for instructor in instructors %}
+                                    <option value="{{ instructor }}">{{ instructor }}</option>
+                                    {% endfor %}
+                                    <option value="new">Add new instructor...</option>
+                                </select>
+                                <input type="text" id="new-instructor" name="new_instructor"
+                                    class="form-control mt-2 d-none" placeholder="Enter new instructor name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="host" class="form-label">Host:</label>
+                                <select class="form-select" id="host-select" name="host">
+                                    <option value="">Select host...</option>
+                                    {% for host in hosts %}
+                                    <option value="{{ host }}">{{ host }}</option>
+                                    {% endfor %}
+                                    <option value="new">Add new host...</option>
+                                </select>
+                                <input type="text" id="new-host" name="new_host" class="form-control mt-2 d-none"
+                                    placeholder="Enter new host name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="date" class="form-label">Date:</label>
+                                <input type="date" class="form-control" id="date" name="date" required
+                                    pattern="\d{4}-\d{2}-\d{2}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="title" class="form-label">Title:</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="part" class="form-label">Part:</label>
+                                <input type="number" class="form-control" id="part" name="part" min="1" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="num_parts" class="form-label">Total Parts:</label>
+                                <input type="number" class="form-control" id="num_parts" name="num_parts" min="1"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label for="status" class="form-label">Status:</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="Planning">Planning</option>
+                                    <option value="Invited">Invited</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="language" value="{{ lang }}">
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Create Engagement</button>
+                        <a href="/views/index/{{ lang }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const instructorSelect = document.getElementById('instructor-select');
+            const newInstructorInput = document.getElementById('new-instructor');
+            const hostSelect = document.getElementById('host-select');
+            const newHostInput = document.getElementById('new-host');
+
+            instructorSelect.addEventListener('change', function () {
+                if (this.value === 'new') {
+                    newInstructorInput.classList.remove('d-none');
+                    newInstructorInput.required = true;
+                } else {
+                    newInstructorInput.classList.add('d-none');
+                    newInstructorInput.required = false;
+                }
+            });
+
+            hostSelect.addEventListener('change', function () {
+                if (this.value === 'new') {
+                    newHostInput.classList.remove('d-none');
+                    newHostInput.required = true;
+                } else {
+                    newHostInput.classList.add('d-none');
+                    newHostInput.required = false;
+                }
+            });
+        });
+
+        document.getElementById('engagementForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            try {
+                if (formData.get('instructor') === 'new') {
+                    const newInstructor = formData.get('new_instructor');
+                    const instructorResponse = await fetch(`/instructors/${encodeURIComponent(newInstructor)}`, {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    });
+                    if (!instructorResponse.ok) {
+                        throw new Error('Failed to add new instructor');
+                    }
+                }
+
+                if (formData.get('host') === 'new') {
+                    const newHost = formData.get('new_host');
+                    const hostResponse = await fetch(`/hosts/${encodeURIComponent(newHost)}`, {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    });
+                    if (!hostResponse.ok) {
+                        throw new Error('Failed to add new host');
+                    }
+                }
+
+                const jsonData = {
+                    instructor: formData.get('instructor') === 'new' ? formData.get('new_instructor') : formData.get('instructor'),
+                    host: formData.get('host') === 'new' ? formData.get('new_host') : formData.get('host'),
+                    date: formData.get('date'),
+                    language: "{{ lang }}",
+                    title: formData.get('title'),
+                    part: parseInt(formData.get('part')),
+                    num_parts: parseInt(formData.get('num_parts')),
+                    status: formData.get('status')
+                };
+
+                const response = await fetch('/engs', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.details || 'Failed to create engagement');
+                }
+
+                window.location.href = `/views/index/{{ lang }}`;
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

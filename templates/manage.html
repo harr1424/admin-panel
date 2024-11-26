@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Team</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="container-fluid mb-4">
+            <nav class="nav nav-pills">
+                <a href="/views/index" class="nav-link">View Engagements</a>
+                <a href="/views/new" class="nav-link">Add Engagement</a>
+                <a href="/views/manage" class="nav-link active">Manage Team</a>
+                <form action="/auth/logout" method="POST" class="ms-2">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </button>
+                </form>
+            </nav>
+        </div>
+
+        <div class="row mt-4 g-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-people-fill me-2"></i>
+                            Instructors
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-4">
+                            <input type="text" class="form-control" id="instructorInput" placeholder="Add Instructor">
+                            <button class="btn btn-primary" onclick="addInstructor()">
+                                <i class="bi bi-plus-lg me-1"></i>
+                                Add
+                            </button>
+                        </div>
+
+                        <div class="scrollspy-example" data-bs-spy="scroll" data-bs-target="#instructorsList"
+                            tabindex="0" style="height: 400px; overflow-y: auto;">
+                            <div class="list-group list-group-flush" id="instructorsList">
+                                {% for instructor in instructors %}
+                                <div
+                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                    <span class="ms-2">{{ instructor }}</span>
+                                    <button class="btn btn-outline-danger btn-sm"
+                                        onclick="deleteInstructor('{{ instructor }}')">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-mic-fill me-2"></i>
+                            Hosts
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group mb-4">
+                            <input type="text" class="form-control" id="hostInput" placeholder="Add Host">
+                            <button class="btn btn-primary" onclick="addHost()">
+                                <i class="bi bi-plus-lg me-1"></i>
+                                Add
+                            </button>
+                        </div>
+
+                        <div class="scrollspy-example" data-bs-spy="scroll" data-bs-target="#hostsList" tabindex="0"
+                            style="height: 400px; overflow-y: auto;">
+                            <div class="list-group list-group-flush" id="hostsList">
+                                {% for host in hosts %}
+                                <div
+                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                                    <span class="ms-2">{{ host }}</span>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteHost('{{ host }}')">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        async function addInstructor() {
+            const input = document.getElementById('instructorInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            try {
+                const response = await fetch(`/instructors/${encodeURIComponent(name)}`, {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                if (response.ok) {
+                    input.value = '';
+                    window.location.reload();
+                } else {
+                    alert('Failed to add instructor');
+                }
+            } catch (error) {
+                alert('Error adding instructor');
+            }
+        }
+
+        async function deleteInstructor(name) {
+            if (!confirm(`Are you sure you want to delete instructor "${name}"?`)) return;
+
+            try {
+                const response = await fetch(`/instructors/${encodeURIComponent(name)}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete instructor');
+                }
+            } catch (error) {
+                alert('Error deleting instructor');
+            }
+        }
+
+        async function addHost() {
+            const input = document.getElementById('hostInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            try {
+                const response = await fetch(`/hosts/${encodeURIComponent(name)}`, {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+                if (response.ok) {
+                    input.value = '';
+                    window.location.reload();
+                } else {
+                    alert('Failed to add host');
+                }
+            } catch (error) {
+                alert('Error adding host');
+            }
+        }
+
+        async function deleteHost(name) {
+            if (!confirm(`Are you sure you want to delete host "${name}"?`)) return;
+
+            try {
+                const response = await fetch(`/hosts/${encodeURIComponent(name)}`, {
+                    method: 'DELETE', 
+                    credentials: 'same-origin'
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete host');
+                }
+            } catch (error) {
+                alert('Error deleting host');
+            }
+        }
+    </script>
+</body>
+
+</html>
